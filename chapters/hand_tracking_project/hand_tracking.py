@@ -13,14 +13,28 @@ class HandDetector:
 
     def find_hands(self, img, draw=True):
         img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        results = self.hands.process(img_rgb)
+        self.results = self.hands.process(img_rgb)
         
-        if results.multi_hand_landmarks:
-            for hand_landmarks in results.multi_hand_landmarks:  
+        if self.results.multi_hand_landmarks:
+            for hand_landmarks in self.results.multi_hand_landmarks:  
                 if draw:                                      
                     self.mp_draw.draw_landmarks(image=img, landmark_list=hand_landmarks, connections=self.mp_hands.HAND_CONNECTIONS)
 
         return img
+    
+    def find_position(self, img, hand_no=0, draw=True):
+        landmark_list = []
+        if self.results.multi_hand_landmarks:
+            hand = self.results.multi_hand_landmarks[hand_no]
+            for id, landmark in enumerate(hand.landmark):
+                h, w, c = img.shape
+                cx, cy = int(landmark.x * w), int(landmark.y * h)
+                landmark_list.append([id, cx, cy])
+                
+                if draw:
+                    cv2.circle(img=img, center=(cx, cy), radius=10, color=(0, 255, 0), thickness=cv2.FILLED)
+                
+        return landmark_list
 
 def main():   
     cap = cv2.VideoCapture(0)
@@ -37,6 +51,13 @@ def main():
         if not success:
             print("Failed to read frame")
             break
+        
+        # img = cv2.flip(img, 1)
+        
+        landmark_list = detector.find_position(img=img)
+        if len(landmark_list) != 0:
+            print(landmark_list[4])
+        
         
         c_time = time.time()
         fps = 1/(c_time-p_time)
