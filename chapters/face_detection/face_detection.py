@@ -1,4 +1,4 @@
-import cv2, time
+import cv2, cvzone, time
 import mediapipe as mp
 from collections import namedtuple
 
@@ -34,12 +34,14 @@ class FaceDetector:
     def allocate_face(self, img, detections: list):
         for detection in detections:
             bbox = detection.bbox
-            cv2.rectangle(img, bbox, color=(0, 255, 0), thickness=2)
+            # cv2.rectangle(img, bbox, color=(0, 255, 0), thickness=2)
+            cvzone.cornerRect(img=img, bbox=bbox, l=15, t=2, rt=3, colorC=(0, 255, 0), colorR=(0, 0, 0))
             cv2.putText(img=img, text=f'{int(detection.score*100)}%', org=(bbox.x, bbox.y-10), 
                         fontFace=cv2.FONT_HERSHEY_PLAIN, fontScale=2, color=(0, 255, 0), thickness=2)
 
 def main():
     cap = cv2.VideoCapture("chapters/videos/face-4.mp4")
+    # cap = cv2.VideoCapture(0)
     
     face_detector = FaceDetector(min_detection_conf=0.75)
     
