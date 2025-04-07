@@ -20,20 +20,22 @@ class PoseDetector:
     
     def detect_position(self, img, draw=True):
         landmark_list = []
-        for id, landmark in enumerate(self.results.pose_landmarks.landmark):
-            h, w, c = img.shape
-            cx, cy = int(landmark.x*w), int(landmark.y*h)
-            landmark_list.append([id, cx, cy])
-            
-            if draw:
-                cv2.circle(img=img, center=(cx, cy), radius=5, color=(0, 255, 0), thickness=cv2.FILLED)
+        if self.results.pose_landmarks:
+            for id, landmark in enumerate(self.results.pose_landmarks.landmark):
+                h, w, c = img.shape
+                cx, cy = int(landmark.x*w), int(landmark.y*h)
+                landmark_list.append([id, cx, cy])
+                
+                if draw:
+                    cv2.circle(img=img, center=(cx, cy), radius=2, color=(0, 255, 0), thickness=cv2.FILLED)
 
         return landmark_list
     
     
 def main():
     cap = cv2.VideoCapture("chapters/videos/pose-6.mp4")
-
+    # cap = cv2.VideoCapture(0)
+    
     p_time = 0
     
     pose = PoseDetector()
