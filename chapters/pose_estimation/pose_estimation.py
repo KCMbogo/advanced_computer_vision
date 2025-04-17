@@ -1,4 +1,4 @@
-import cv2, time
+import cv2, time, math
 import mediapipe as mp
 
 
@@ -19,17 +19,40 @@ class PoseDetector:
         return img
     
     def detect_position(self, img, draw=True):
-        landmark_list = []
+        self.landmark_list = []
         if self.results.pose_landmarks:
             for id, landmark in enumerate(self.results.pose_landmarks.landmark):
                 h, w, c = img.shape
                 cx, cy = int(landmark.x*w), int(landmark.y*h)
-                landmark_list.append([id, cx, cy])
+                self.landmark_list.append([id, cx, cy])
                 
                 if draw:
                     cv2.circle(img=img, center=(cx, cy), radius=2, color=(0, 255, 0), thickness=cv2.FILLED)
 
-        return landmark_list
+        return self.landmark_list
+    
+    def find_angle(self, img, index_1, index_2, index_3, draw=True):
+        x1, y1 = self.landmark_list[index_1][1:]
+        x2, y2 = self.landmark_list[index_2][1:]
+        x3, y3 = self.landmark_list[index_3][1:]
+        
+        angle = math.degrees(math.atan2(y3-y2, x3-x2) - math.atan2(y1-y2, x1-x2))
+        
+        if angle < 0:
+            angle += 360
+        
+        if draw:
+            cv2.line(img=img, pt1=(x1, y1), pt2=(x2, y2), color=(255, 255, 255), thickness=3)
+            cv2.line(img=img, pt1=(x3, y3), pt2=(x2, y2), color=(255, 255, 255), thickness=3)
+            cv2.circle(img=img, center=(x1, y1), radius=10, color=(0, 0, 255), thickness=cv2.FILLED)
+            cv2.circle(img=img, center=(x1, y1), radius=15, color=(0, 0, 255), thickness=2)
+            cv2.circle(img=img, center=(x2, y2), radius=10, color=(0, 0, 255), thickness=cv2.FILLED)
+            cv2.circle(img=img, center=(x2, y2), radius=15, color=(0, 0, 255), thickness=2)
+            cv2.circle(img=img, center=(x3, y3), radius=10, color=(0, 0, 255), thickness=cv2.FILLED)
+            cv2.circle(img=img, center=(x3, y3), radius=15, color=(0, 0, 255), thickness=2)
+            # cv2.putText(img=img, text=str(int(angle)), org=(x2+10, y2+30), 
+            #             fontFace=cv2.FONT_HERSHEY_PLAIN, fontScale=2, color=(0, 0, 255), thickness=2)
+        return angle
     
     
 def main():
