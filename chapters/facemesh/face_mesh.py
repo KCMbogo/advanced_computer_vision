@@ -32,8 +32,8 @@ class FaceMesh:
                     
                     
 def main():
-    # cap = cv2.VideoCapture(0)
-    cap = cv2.VideoCapture("chapters/videos/face-4.mp4")
+    cap = cv2.VideoCapture(0)
+    # cap = cv2.VideoCapture("chapters/videos/face-4.mp4")
     face_mesh = FaceMesh(max_num_faces=2)
     
     p_time = 0
